@@ -1,0 +1,39 @@
+name:  01 type 1 workflow input demo 
+
+on: 
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: Deployment environment
+                required: true
+                type: choice
+                default: dev
+
+
+                options: 
+                    - dev
+                    - qa
+                    - prod
+            
+            perform_smoke_test:
+                description: Execute smoke test 
+                required: true
+                type: boolean
+                default: true
+
+env: 
+    APPLICATION_NAME: cwvj-flask-app
+    DOCKER_USERNAME: abinthomas01
+    IMAGE_TAG: v1.0.1
+
+jobs:
+    flask-ci-job:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: checkout repository
+              uses: actions/checkout@v6
+            
+            - name: Displays input values 
+              run: | 
+                echo "environment: ${{ inputs.environment }}"
+                echo " Perofmr smoke test: ${{ inputs.perform_smoke_test }}"
