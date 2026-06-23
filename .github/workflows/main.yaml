@@ -1,39 +1,34 @@
-name:  01 type 1 workflow input demo 
-
+name: payment service deployment 
 on: 
-    workflow_dispatch:
-        inputs:
-            environment:
-                description: Deployment environment
-                required: true
-                type: choice
-                default: dev
+  workflow_dispatch:
+  push:
 
+jobs: 
+  run-unit-tests-job:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: execute unit tests
+        run: |
+          echo " running payment service unit tests..."
+          echo "All tests passed"
+  
+  build-payment-artifacts-job:
+    runs-on: ubuntu-latest
 
-                options: 
-                    - dev
-                    - qa
-                    - prod
-            
-            perform_smoke_test:
-                description: Execute smoke test 
-                required: true
-                type: boolean
-                default: true
-
-env: 
-    APPLICATION_NAME: cwvj-flask-app
-    DOCKER_USERNAME: abinthomas01
-    IMAGE_TAG: v1.0.1
-
-jobs:
-    flask-ci-job:
-        runs-on: ubuntu-latest
-        steps: 
-            - name: checkout repository
-              uses: actions/checkout@v6
-            
-            - name: Displays input values 
-              run: | 
-                echo "environment: ${{ inputs.environment }}"
-                echo " Perofmr smoke test: ${{ inputs.perform_smoke_test }}"
+    needs:
+      - run-unit-tests-job
+    steps:
+      - name: build payment artifacts
+        run: |
+          echo " building payment service artifacts"
+          echo "artifacts generated successfully"
+  
+  deploy-payment-service-job:
+    needs: 
+      - build-payment-artifacts-job
+    
+    uses: ./.github/workflows/deploy.yaml
+    with: 
+      application_name: payment-service
+      run_security_scan: true
+      replicas: 6

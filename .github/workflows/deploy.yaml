@@ -1,0 +1,40 @@
+name: 01 reusable deployment workflow 
+
+on: 
+    workflow_call: 
+        inputs: 
+            application_name:
+                required: true
+                type: string
+            
+            run_security_scan:
+                required: true
+                type: boolean
+            replicas:
+                required: true
+                type: number
+
+
+jobs:
+    deploy-applicatoin-job:
+        runs-on: ubuntu-latest
+        steps:
+            - name: display deployment parameters
+              run:  | 
+                echo "Application: ${{ inputs.application_name }}"
+                echo "run security scan: ${{ inputs.run_security_scan }}" 
+                echo "replicas: ${{ inputs.replicas }}"
+
+            - name: security validation 
+              if: ${{ inputs.run_security_scan }}
+              run: |
+                echo " running security scan..."
+                echo "no critical vulnerabilitiies found"
+            
+            - name: deploy application 
+              run: | 
+                echo " deploying ${{ inputs.application_name }}"
+                echo "desired replicas : ${{ inputs.replicas }}"
+            - name: deployment complete 
+              run: |
+                    echo "deployment completed successfully"
